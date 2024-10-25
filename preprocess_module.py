@@ -15,7 +15,7 @@ def preprocess_input(color, brand, price, material_type, brand_means, scaler, co
         new_data[col] = [1 if col == f'material_type_{material_type}' else 0]
 
     # Target encode brand using the precomputed brand means
-    new_data['brand_encoded'] = [brand_means.get(brand, 0.3)]  # Default to 0 if brand not found
+    new_data['brand_encoded'] = [brand_means.get(brand, 0.4)]  # Default to 0 if brand not found
 
     # Scale price
     new_data['price_scaled'] = scaler.transform([[price]])[0]
