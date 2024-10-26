@@ -8,7 +8,7 @@ from LLM_module import generate_explanation  # Import the function to generate e
 from PIL import Image, ImageTk  # Ensure you have `Pillow` installed
 import webbrowser
 import webview
-import tkwebview2 
+# import tkwebview2 
 
 # Load the pickled components
 with open('model_components.pkl', 'rb') as f:
