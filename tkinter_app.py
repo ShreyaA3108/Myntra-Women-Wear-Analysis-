@@ -6,9 +6,7 @@ import pandas as pd
 from preprocess_module import preprocess_input
 from LLM_module import generate_explanation  # Import the function to generate explanations
 from PIL import Image, ImageTk  # Ensure you have `Pillow` installed
-import webbrowser
 import webview
-# import tkwebview2 
 
 # Load the pickled components
 with open('model_components.pkl', 'rb') as f:
@@ -73,14 +71,11 @@ root = tk.Tk()
 root.title("Product Success Predictor")
 root.geometry("600x600")
 
-# Create Frames
-predict_frame = tk.Frame(root)
-visualization_frame = tk.Frame(root)
-
-for frame in (predict_frame, visualization_frame):
-    frame.grid(row=0, column=0, sticky='nsew')
-
 # -------- Prediction Frame --------
+predict_frame = tk.Frame(root)
+predict_frame.grid(row=0, column=0, sticky='nsew')
+
+# Input fields
 tk.Label(predict_frame, text="Color:").pack(pady=5)
 color_entry = tk.Entry(predict_frame)
 color_entry.pack(pady=5)
@@ -108,48 +103,15 @@ view_suggestions_button = tk.Button(
 )
 view_suggestions_button.pack(pady=10)
 
+# Button to open the interactive chart directly
 visualize_button = tk.Button(predict_frame, text="Show Visualizations", 
-                             command=lambda: show_frame(visualization_frame))
+                             command=lambda: open_webview())
 visualize_button.pack(pady=10)
-
-# -------- Visualization Frame --------
-# Load and display the image
-# img = Image.open("image.png")  # Use your image path
-# photo = ImageTk.PhotoImage(img)
-
-# img_label = tk.Label(visualization_frame, image=photo)
-# img_label.image = photo  # Keep a reference to avoid garbage collection
-# img_label.pack(padx=10, pady=10)
-
-# # Button to go back to Prediction Frame
-# back_button = tk.Button(visualization_frame, text="Back to Prediction", 
-#                         command=lambda: show_frame(predict_frame))
-# back_button.pack(pady=10)
-
-# # Start with the Prediction Frame
-# show_frame(predict_frame)
-
-#or
 
 def open_webview():
     # Open a new webview window with the HTML chart
-    webview.create_window("Interactive Chart", "interactive_pie_chart.html")
+    webview.create_window("Interactive Chart", "combined_interactive_plots5.html")
     webview.start()  # Starts the webview event loop
-
-visualization_frame = tk.Frame(root)
-visualization_frame.grid(row=0, column=0, sticky='nsew')
-
-open_chart_button = tk.Button(
-    visualization_frame, text="View Interactive Chart", command=open_webview
-)
-open_chart_button.pack(pady=10)
-
-# Button to go back to Prediction Frame (if applicable)
-back_button = tk.Button(
-    visualization_frame, text="Back to Prediction", 
-    command=lambda: show_frame(predict_frame)
-)
-back_button.pack(pady=10)
 
 # Start with the Prediction Frame
 show_frame(predict_frame)
