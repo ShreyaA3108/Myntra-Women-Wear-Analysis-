@@ -31,7 +31,8 @@ def generate_explanation(user_color, user_brand, user_price, user_material_type,
 
     {prediction_text}
     Based on this , please provide a generalised view to why this is the outcome.
-    Also suggest ways the company can improve is product.please provide everything in short.please dont say lack of dataset only provide your generalised view based on the given success probabilities
+    Also suggest ways the company can improve is product.please provide everything in short.please dont say lack of dataset only provide your generalised view based on the given success probabilities.
+    please answer in short only.
     """
 
     # Call the Groq LLM (Llama3-8b-8192) to generate the explanation
