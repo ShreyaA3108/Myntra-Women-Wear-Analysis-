@@ -72,7 +72,7 @@ def predict_value():
 
 def open_webview():
     # Open a new webview window with the HTML chart
-    webview.create_window("Interactive Chart", "combined_interactive_plots.html")
+    webview.create_window("Interactive Chart", "combined_interactive_plots_dark_theme.html")
     webview.start()  # Starts the webview event loop
 
 # Create Tkinter Window
@@ -160,4 +160,11 @@ show_frame(predict_frame)
 
 # Run the Tkinter event loop
 root.mainloop()
+
+
+
+
+
+
+
 
