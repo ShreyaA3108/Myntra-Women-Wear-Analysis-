@@ -7,6 +7,9 @@ from preprocess_module import preprocess_input
 from LLM_module import generate_explanation
 from PIL import Image, ImageTk
 import webview
+from PIL import ImageDraw, ImageFont
+from tkinter import Toplevel, Canvas, Frame, Scrollbar
+from PIL import Image, ImageTk
 
 # Load the pickled components
 with open('model_components.pkl', 'rb') as f:
@@ -26,48 +29,94 @@ material_columns = components['material_columns']
 def show_frame(frame):
     frame.tkraise()
 
-def display_suggestions(explanation):
-    suggestion_window = Toplevel(root)
-    suggestion_window.title("Product Success Suggestions")
-    suggestion_window.geometry("420x400")
-    suggestion_window.configure(bg="#23272A")
+# Function to show_prediction_window
+def show_prediction_window(product_name, result, explanation):
+    # Create a new window for prediction display    
+    prediction_window = Toplevel(root)
+    prediction_window.title("Prediction Result")
+    prediction_window.geometry("500x700")
+    prediction_window.configure(bg="#23272A")
 
-    # Display the generated explanation text in the window
+    # Canvas and scrollbar setup
+    canvas = Canvas(prediction_window, bg="#23272A", highlightthickness=0)
+    scrollbar = Scrollbar(prediction_window, orient="vertical", command=canvas.yview)
+    scrollable_frame = Frame(canvas, bg="#23272A")
+
+    # Configure the canvas
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+    )
+    canvas.create_window((250, 0), window=scrollable_frame, anchor="n")  # Center horizontally by using anchor="n" with x-offset
+
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    # Pack canvas and scrollbar
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
+
+    # Display the result title at the top, centered
     tk.Label(
-        suggestion_window, text=explanation, wraplength=380, justify="left",
-        font=("Arial", 12), fg="white", bg="#23272A",
-    ).pack(pady=30)
+        scrollable_frame, text=f"Predicted Outcome for '{product_name}': {result}",
+        font=("Arial", 16, "bold"), fg="white", bg="#23272A"
+    ).pack(pady=20, anchor="center")
+
+    # Details Frame: Center content and display image
+    details_frame = Frame(scrollable_frame, bg="#23272A")
+    details_frame.pack(fill="both", padx=650)
+
+    # Display uploaded image if available
+    if uploaded_image_path:
+        img = Image.open(uploaded_image_path)
+        img.thumbnail((300, 300))
+        img_tk = ImageTk.PhotoImage(img)
+        img_label = tk.Label(details_frame, image=img_tk, bg="#23272A")
+        img_label.image = img_tk
+        img_label.pack(pady=10, anchor="center")
+
+    # Product details section
+    tk.Label(details_frame, text="Product Details", font=("Arial", 14, "bold"), fg="#ADBAC7", bg="#23272A").pack(pady=(10, 5), anchor="center")
+    tk.Label(details_frame, text=f"Color: {color_entry.get()}", font=("Arial", 12), fg="white", bg="#23272A").pack(pady=2, anchor="center")
+    tk.Label(details_frame, text=f"Brand: {brand_entry.get()}", font=("Arial", 12), fg="white", bg="#23272A").pack(pady=2, anchor="center")
+    tk.Label(details_frame, text=f"Material: {material_entry.get()}", font=("Arial", 12), fg="white", bg="#23272A").pack(pady=2, anchor="center")
+    tk.Label(details_frame, text=f"Price: ₹{price_entry.get()}", font=("Arial", 12), fg="white", bg="#23272A").pack(pady=2, anchor="center")
+
+    # Separator line for aesthetics
+    Frame(scrollable_frame, height=2,width=400, bd=1, relief="sunken", bg="#444").pack(pady=15)
+
+    # Prediction explanation section
+    tk.Label(scrollable_frame, text="Prediction Explanation", font=("Arial", 14, "bold"), fg="#ADBAC7", bg="#23272A").pack(pady=(10, 5), anchor="center")
+    explanation_label = tk.Label(
+        scrollable_frame, text=explanation, wraplength=400, justify="center",
+        font=("Arial", 12), fg="white", bg="#23272A"
+    )
+    explanation_label.pack(pady=(5, 20), padx=10, anchor="center")
+
+    # Ensure the scrollbar works with the canvas
+    canvas.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
+
+
 
 def predict_value():
     try:
         # Collect input values from the UI
-        product_name = product_name_entry.get()  # New input for product name
+        product_name = product_name_entry.get()
         color = color_entry.get()
         brand = brand_entry.get()
         price = float(price_entry.get())
         material = material_entry.get()
 
-        # Preprocess the inputs
-        new_product_df = preprocess_input(
-            color, brand, price, material,
-            brand_means, scaler, color_columns, material_columns
-        )
-
-        # Predict the outcome using the voting classifier
+        # Preprocess the inputs and make predictions
+        new_product_df = preprocess_input(color, brand, price, material, brand_means, scaler, color_columns, material_columns)
         new_product_pred = voting_clf.predict(new_product_df)[0]
         new_product_pred_proba = voting_clf.predict_proba(new_product_df)[0, 1]
-
-        # Display the prediction
         result = "Success" if new_product_pred == 1 else "Loss"
-        messagebox.showinfo("Prediction", f"Predicted Outcome for '{product_name}': {result}")
 
-        # Generate explanation using the LLM
+        # Generate explanation
         explanation = generate_explanation(color, brand, price, material, new_product_pred, new_product_pred_proba)
 
-        # Enable View Suggestions button and pass explanation
-        view_suggestions_button.config(state="normal")
-        view_suggestions_button.explanation = explanation
-
+        # Show prediction and explanation in a new window with the uploaded image
+        show_prediction_window(product_name, result, explanation)
     except ValueError:
         messagebox.showerror("Invalid Input", "Please enter valid inputs.")
 
@@ -76,10 +125,11 @@ def open_webview():
     webview.start()
 
 def upload_image():
+    global uploaded_image_path
     file_path = filedialog.askopenfilename(title="Select an Image", filetypes=[("Image Files", ".jpg;.jpeg;.png;.gif")])
     if file_path:
-        # You can add code to display the image or store the file path as needed
-        image_label.config(text=f"Uploaded Image: {file_path.split('/')[-1]}")  # Display the file name
+        uploaded_image_path = file_path  # Store the file path globally
+        image_label.config(text=f"Uploaded Image: {file_path.split('/')[-1]}")
 
 # Create Tkinter Window
 root = tk.Tk()
@@ -158,15 +208,6 @@ predict_button = tk.Button(predict_frame, text="Predict", command=predict_value,
 predict_button.grid(row=12, column=0, pady=(10, 10))
 predict_button.bind("<Enter>", on_enter)
 predict_button.bind("<Leave>", on_leave)
-
-view_suggestions_button = tk.Button(
-    predict_frame, text="View Suggestions", state="disabled", 
-    command=lambda: display_suggestions(view_suggestions_button.explanation),
-    **button_style
-)
-view_suggestions_button.grid(row=13, column=0, pady=(10, 10))
-view_suggestions_button.bind("<Enter>", on_enter)
-view_suggestions_button.bind("<Leave>", on_leave)
 
 visualize_button = tk.Button(
     predict_frame, text="Show Visualizations", command=open_webview, **button_style
