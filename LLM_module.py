@@ -26,13 +26,14 @@ def generate_explanation(user_color, user_brand, user_price, user_material_type,
     Based on the following product details:
     - Color: {user_color} with {color_success}% success of this color
     - Brand: {user_brand} with {brand_success}% success of this brand
-    - Price: {user_price} 
+    - Price: INR{user_price} 
     - Material Type: {user_material_type} with {material_type_success}% success of this material_type
 
     {prediction_text}
     Based on this , please provide a generalised view to why this is the outcome.
     Also suggest ways the company can improve is product.please provide everything in short.please dont say lack of dataset only provide your generalised view based on the given success probabilities.
-    please answer in short only. Please don't give your response in terms of individual percentages but write the overall success percetnage of product in you response.
+    please answer in short only. Please don't give your response in terms of individual percentages but write the overall success percentage of product in you response.pls dont exceed word limit of 150.
+    and pls dont write that you dont have the data in your response.
     """
 
     # Call the Groq LLM (Llama3-8b-8192) to generate the explanation
