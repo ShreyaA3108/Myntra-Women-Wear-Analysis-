@@ -1,7 +1,7 @@
 # Myntra Women Wear Analysis 👗📊
 
 ## 📌 Overview
-This project analyzes **Myntra Women’s Wear dataset** to predict whether a product will be a **boon (successful)** or **not boon (unsuccessful)** in the market.  
+This project analyzes **Myntra Women’s Wear dataset** to predict whether a product will be a **boon (successful)** or **loss (unsuccessful)** in the market.  
 
 The workflow is **semi-supervised**:  
 - First, we use **K-Means clustering** to automatically label products based on **rating, rating count, and price**.  
@@ -11,7 +11,7 @@ The workflow is **semi-supervised**:
 ---
 
 ## 🎯 Objectives
-- Create labels (boon / not boon) using clustering.  
+- Create labels (boon / loss) using clustering.  
 - Predict product success with high accuracy.  
 - Provide interpretable insights using Logistic Regression.  
 - Capture complex feature interactions with Random Forest.  
