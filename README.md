@@ -19,9 +19,6 @@ The workflow is **semi-supervised**:
 
 ---
 
-
----
-
 ## ⚙️ Methodology
 
 ### 1. Data Labeling (K-Means Clustering)
