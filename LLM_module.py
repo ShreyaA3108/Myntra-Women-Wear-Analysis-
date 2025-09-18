@@ -44,7 +44,7 @@ def generate_explanation(user_color, user_brand, user_price, user_material_type,
                 "content": prompt
             }
         ],
-        model="llama3-8b-8192",  # Using Groq's LLM model
+        model="llama-3.1-8b-instant",  # Using Groq's LLM model
     )
 
     # Extract and return the generated explanation
